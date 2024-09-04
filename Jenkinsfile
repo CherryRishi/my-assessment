@@ -1,43 +1,41 @@
 pipeline {
     agent any
 
-    environment {
-        PROJECT_ID = 'my-assessment-434612'
-        DOCKER_IMAGE = "gcr.io/$PROJECT_ID/my-app"
-    }
-
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
+                // Pull the code from the repository
                 git 'https://github.com/CherryRishi/my-assessment.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                // Install the required dependencies
+                sh 'npm install'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                // Run the build script
+                sh 'npm run build'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'npm install'
-                sh 'npm test' // or other test command
+                // Run the tests
+                sh 'npm test'
             }
         }
 
-        stage('Push Image') {
+        stage('Deploy') {
             steps {
-                sh 'docker push $DOCKER_IMAGE'
-            }
-        }
-
-        stage('Deploy to Compute Engine') {
-            steps {
+                // Deploy the application (this is a placeholder, adapt to your deployment strategy)
                 sh '''
-                gcloud compute instances update-container web-server \
-                  --zone=us-central1-a \
-                  --container-image=$DOCKER_IMAGE
+                echo "Deploying to production server"
+                scp -r * user@your-server:/var/www/html/your-app
                 '''
             }
         }
@@ -45,7 +43,16 @@ pipeline {
 
     post {
         always {
+            // Clean up the workspace
             cleanWs()
+        }
+        success {
+            // Notify on success (optional)
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            // Notify on failure (optional)
+            echo 'Build or deployment failed!'
         }
     }
 }
