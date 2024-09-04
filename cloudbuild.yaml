@@ -1,0 +1,29 @@
+steps:
+  - name: 'gcr.io/cloud-builders/git'
+    entrypoint: 'bash'
+    args: ['-c', 'git clone https://github.com/CherryRishi/my-assessment.git && cd your-repo']
+
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'test']  # Run your tests here
+
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']  # Build your application
+
+  - name: 'gcr.io/cloud-builders/ssh'
+    args:
+      - 'user@instance-ip'
+      - 'sudo systemctl stop nginx'
+      - '&& sudo rm -rf /var/www/html/*'
+      - '&& sudo cp -r * /var/www/html/'
+      - '&& sudo systemctl start nginx'
+    secretEnv: ['SSH_PRIVATE_KEY']
+
+secrets:
+- kmsKeyName: projects/your-project-id/locations/global/keyRings/my-keyring/cryptoKeys/my-key
+  secretEnv:
+    SSH_PRIVATE_KEY: <ENCRYPTED_PRIVATE_KEY>
+
+timeout: '1200s'
