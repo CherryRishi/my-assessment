@@ -22,7 +22,7 @@ steps:
     secretEnv: ['SSH_PRIVATE_KEY']
 
 secrets:
-- kmsKeyName: projects/your-project-id/locations/global/keyRings/my-keyring/cryptoKeys/my-key
+- kmsKeyName: projects/my-assessment-434612/locations/global/keyRings/my-keyring/cryptoKeys/my-key
   secretEnv:
     SSH_PRIVATE_KEY: <ENCRYPTED_PRIVATE_KEY>
 
